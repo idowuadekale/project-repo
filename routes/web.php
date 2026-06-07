@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Student\ProjectController;
 use App\Http\Controllers\Student\StudentController;
 use App\Http\Controllers\Supervisor\ProjectController as SupervisorProjectController;
@@ -48,7 +50,28 @@ Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
+        // Dashboard
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
+        // User management
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
+        Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
+        Route::get('/users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+
+        // Project management
+        Route::get('/projects', [AdminProjectController::class, 'index'])->name('projects.index');
+        Route::get('/projects/{project}', [AdminProjectController::class, 'show'])->name('projects.show');
+        Route::post('/projects/{project}/approve', [AdminProjectController::class, 'approve'])->name('projects.approve');
+        Route::post('/projects/{project}/reject', [AdminProjectController::class, 'reject'])->name('projects.reject');
+        Route::post('/projects/{project}/supervisor', [AdminProjectController::class, 'assignSupervisor'])->name('projects.supervisor');
+        Route::delete('/projects/{project}', [AdminProjectController::class, 'destroy'])->name('projects.destroy');
+        Route::get('/projects/{project}/download', [AdminProjectController::class, 'download'])->name('projects.download');
+
+        // Activity log
+        Route::get('/activity', [AdminProjectController::class, 'activityLog'])->name('activity');
     });
 
 // Shared: any authenticated user can download approved project PDFs
