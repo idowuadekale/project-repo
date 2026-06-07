@@ -2,14 +2,26 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\RepositoryController;
 use App\Http\Controllers\Student\ProjectController;
 use App\Http\Controllers\Student\StudentController;
 use App\Http\Controllers\Supervisor\ProjectController as SupervisorProjectController;
 use App\Http\Controllers\Supervisor\SupervisorController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => redirect()->route('login'));
+Route::get('/', function () {
+    if (auth()->check()) {
+        return match (auth()->user()->role) {
+            'admin' => redirect()->route('admin.dashboard'),
+            'supervisor' => redirect()->route('supervisor.dashboard'),
+            default => redirect()->route('student.dashboard'),
+        };
+    }
+
+    return view('welcome');
+});
 
 // Auth routes (provided by Breeze)
 require __DIR__.'/auth.php';
@@ -45,6 +57,16 @@ Route::middleware(['auth', 'role:supervisor'])
         Route::post('/projects/{project}/revert', [SupervisorProjectController::class, 'revert'])->name('projects.revert');
     });
 
+// ─── Repository (all authenticated users) ─────────────────────
+Route::middleware(['auth'])
+    ->prefix('repository')
+    ->name('repository.')
+    ->group(function () {
+        Route::get('/', [RepositoryController::class, 'index'])->name('index');
+        Route::get('/{project}', [RepositoryController::class, 'show'])->name('show');
+        Route::get('/{project}/download', [RepositoryController::class, 'download'])->name('download');
+    });
+
 // Admin routes
 Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
@@ -72,6 +94,8 @@ Route::middleware(['auth', 'role:admin'])
 
         // Activity log
         Route::get('/activity', [AdminProjectController::class, 'activityLog'])->name('activity');
+
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports');
     });
 
 // Shared: any authenticated user can download approved project PDFs

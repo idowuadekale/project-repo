@@ -1,3 +1,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Smooth page transitions */
+main { animation: fadeIn 0.15s ease-in; }
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Status badge consistency */
+.badge-pending  { @apply bg-yellow-100 text-yellow-700 text-xs font-medium px-2.5 py-0.5 rounded-full; }
+.badge-approved { @apply bg-green-100  text-green-700  text-xs font-medium px-2.5 py-0.5 rounded-full; }
+.badge-rejected { @apply bg-red-100   text-red-700    text-xs font-medium px-2.5 py-0.5 rounded-full; }
+
+/* Card hover lift */
+.card-hover {
+    @apply transition-all duration-200 hover:shadow-md hover:-translate-y-0.5;
+}
+
+/* Table row hover */
+tbody tr { @apply hover:bg-gray-50 transition-colors duration-100; }
+
+/* Form input focus */
+input:focus, select:focus, textarea:focus {
+    @apply ring-2 ring-blue-500 ring-opacity-30 border-blue-400 outline-none;
+}
+
+/* Pagination styling */
+nav[aria-label="Pagination"] {
+    @apply flex justify-center mt-4;
+}
