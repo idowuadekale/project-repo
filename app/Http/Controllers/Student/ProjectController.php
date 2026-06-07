@@ -85,7 +85,13 @@ class ProjectController extends Controller
     // Download the PDF
     public function download(Project $project)
     {
-        if ($project->student_id !== auth()->id()) {
+        $user = auth()->user();
+
+        $canDownload = $project->student_id === $user->id
+                    || $project->supervisor_id === $user->id
+                    || $user->isAdmin();
+
+        if (!$canDownload) {
             abort(403);
         }
 

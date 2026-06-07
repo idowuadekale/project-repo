@@ -50,3 +50,11 @@ Route::middleware(['auth', 'role:admin'])
     ->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     });
+
+// Shared: any authenticated user can download approved project PDFs
+Route::middleware(['auth'])
+    ->group(function () {
+        Route::get('/projects/{project}/download',
+            [ProjectController::class, 'download'])
+            ->name('projects.download');
+    });
