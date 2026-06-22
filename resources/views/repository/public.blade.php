@@ -673,7 +673,7 @@
     </div>
 
     <footer class="pub-footer">
-        <p>&copy; {{ date('Y') }} Lagos State University, Ojo — Faculty of Science. Developed by Adepemeji Samuel
+        <p>&copy; {{ date('Y') }} Lagos State University, Ojo - Faculty of Science. Developed by Adepemeji Samuel
             Adetomiwa.</p>
     </footer>
 

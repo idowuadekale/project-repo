@@ -969,6 +969,12 @@
                 animation: none;
             }
         }
+
+        @media (max-width: 767px) {
+            .browse-btn {
+                display: none;
+            }
+        }
     </style>
 </head>
 
@@ -984,12 +990,9 @@
             </div>
         </div>
         <div class="nav-links">
-            <a href="{{ route('public.repository') }}" class="nav-link">Browse Projects</a>
-        </div>
-        <div class="nav-links">
+            <a href="{{ route('public.repository') }}" class="btn-ghost browse-btn">Browse Projects</a>
             <a href="{{ route('login') }}" class="btn-ghost">Login</a>
             <a href="{{ route('register') }}" class="btn-primary">Register</a>
-            {{-- <a href="{{ route('public.repository') }}" class="nav-link">Browse Projects</a> --}}
         </div>
     </nav>
 
@@ -1219,7 +1222,7 @@
     {{-- ── Footer ── --}}
     <footer class="footer">
         <div class="footer-logo">LASU Project Repository</div>
-        <div class="footer-text">&copy; {{ date('Y') }} Lagos State University, Ojo — Department of Computer
+        <div class="footer-text">&copy; {{ date('Y') }} Lagos State University, Ojo - Department of Computer
             Science Education</div>
         <div class="footer-dev">Developed by Adepemeji Samuel Adetomiwa &bull; Final Year Project &bull; 2025</div>
     </footer>
