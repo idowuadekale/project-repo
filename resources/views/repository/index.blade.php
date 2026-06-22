@@ -122,11 +122,11 @@
                                     flex justify-between items-center">
                             <div class="text-xs text-gray-500">
                                 <span class="font-medium text-gray-700">
-                                    {{ $project->student->name ?? '—' }}
+                                    By: {{ $project->student->name ?? '—' }}
                                 </span>
                                 @if ($project->supervisor)
                                     <span class="block text-gray-400">
-                                        Sup: {{ $project->supervisor->name }}
+                                        Supervisor: {{ $project->supervisor->name }}
                                     </span>
                                 @endif
                             </div>

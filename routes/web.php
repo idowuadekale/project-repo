@@ -23,6 +23,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// ── Public repository (no login required) ─────────────────────
+Route::get('/explore', [RepositoryController::class, 'publicIndex'])->name('public.repository');
+Route::get('/explore/{project}', [RepositoryController::class, 'publicShow'])->name('public.repository.show');
+
 // Auth routes (provided by Breeze)
 require __DIR__.'/auth.php';
 

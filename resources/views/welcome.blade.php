@@ -984,8 +984,12 @@
             </div>
         </div>
         <div class="nav-links">
+            <a href="{{ route('public.repository') }}" class="nav-link">Browse Projects</a>
+        </div>
+        <div class="nav-links">
             <a href="{{ route('login') }}" class="btn-ghost">Login</a>
             <a href="{{ route('register') }}" class="btn-primary">Register</a>
+            {{-- <a href="{{ route('public.repository') }}" class="nav-link">Browse Projects</a> --}}
         </div>
     </nav>
 
@@ -1013,11 +1017,11 @@
                     Submit, review, and access approved research — all in one place.
                 </p>
                 <div class="hero-cta">
-                    <a href="{{ route('register') }}" class="btn-cta-primary">
+                    <a href="{{ route('login') }}" class="btn-cta-primary">
                         Get Started &rarr;
                     </a>
-                    <a href="{{ route('login') }}" class="btn-cta-secondary">
-                        Login to Browse
+                    <a href="{{ route('public.repository') }}" class="btn-cta-secondary">
+                        Browse approved projects
                     </a>
                 </div>
                 <div class="hero-stats">
