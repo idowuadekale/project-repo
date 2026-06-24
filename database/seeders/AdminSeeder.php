@@ -12,11 +12,11 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         \App\Models\User::firstOrCreate(
-            ['email' => 'admin@projectrepo.com'],
+            ['email' => 'idowu.s.adekale@gmail.com'],
             [
                 'name' => 'System Admin',
                 'role' => 'admin',
-                'password' => bcrypt('Admin@1234'),
+                'password' => bcrypt('Solomonid1@'),
             ]
         );
     }

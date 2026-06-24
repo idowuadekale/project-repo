@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Department extends Model
 {
-    protected $fillable = ['name'];
+    use HasFactory;
+
+    protected $fillable = ['name', 'description'];
 
     public function users()
     {
@@ -16,5 +19,16 @@ class Department extends Model
     public function projects()
     {
         return $this->hasMany(Project::class);
+    }
+
+    // Count helpers
+    public function studentsCount(): int
+    {
+        return $this->users()->where('role', 'student')->count();
+    }
+
+    public function supervisorsCount(): int
+    {
+        return $this->users()->where('role', 'supervisor')->count();
     }
 }

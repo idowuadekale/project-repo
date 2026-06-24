@@ -113,9 +113,16 @@ class ProjectController extends Controller
     // Activity log view
     public function activityLog(Request $request)
     {
-        $logs = ActivityLog::with('user')
-            ->latest()
-            ->paginate(20);
+        $query = ActivityLog::with('user')->latest();
+
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('action', 'like', '%'.$request->search.'%')
+                  ->orWhere('subject', 'like', '%'.$request->search.'%');
+            });
+        }
+
+        $logs = $query->paginate(20)->withQueryString();
 
         return view('admin.activity', compact('logs'));
     }

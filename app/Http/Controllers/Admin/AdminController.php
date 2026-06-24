@@ -24,15 +24,16 @@ class AdminController extends Controller
         ];
 
         $recentProjects = Project::with(['student', 'supervisor', 'department'])
-            ->latest()
-            ->take(5)
-            ->get();
+            ->latest()->take(6)->get();
 
         $recentLogs = ActivityLog::with('user')
-            ->latest()
-            ->take(8)
-            ->get();
+            ->latest()->take(8)->get();
 
-        return view('admin.dashboard', compact('stats', 'recentProjects', 'recentLogs'));
+        $recentUsers = User::with('department')
+            ->where('role', '!=', 'admin')
+            ->latest()->take(5)->get();
+
+        return view('admin.dashboard',
+            compact('stats', 'recentProjects', 'recentLogs', 'recentUsers'));
     }
 }

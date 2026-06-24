@@ -1,91 +1,159 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="text-xl font-semibold text-gray-800">Add New User</h2>
-    </x-slot>
+    <x-slot name="header">Add User</x-slot>
 
-    <div class="py-8 px-6 max-w-2xl mx-auto">
-        <div class="bg-white rounded-lg shadow p-6">
+    <div class="page-header">
+        <div class="page-header-left">
+            <h1 class="page-title">Add New User</h1>
+            <p class="page-sub">Create a student, supervisor or admin account</p>
+        </div>
+        <a href="{{ route('admin.users.index') }}" class="btn btn-outline">← Back</a>
+    </div>
 
-            @if ($errors->any())
-                <div class="mb-4 p-4 bg-red-50 text-red-700 rounded text-sm">
-                    <ul class="list-disc list-inside">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+    <div style="max-width:680px;">
+        <div class="card">
+            <div class="card-header"><span class="card-title">Account Details</span></div>
+            <div class="card-body">
 
-            <form method="POST" action="{{ route('admin.users.store') }}" class="space-y-5">
-                @csrf
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Full Name</label>
-                    <input type="text" name="name" value="{{ old('name') }}" required
-                        class="mt-1 block w-full border-gray-300 rounded shadow-sm text-sm">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" name="email" value="{{ old('email') }}" required
-                        class="mt-1 block w-full border-gray-300 rounded shadow-sm text-sm">
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Role</label>
-                        <select name="role" required
-                            class="mt-1 block w-full border-gray-300 rounded shadow-sm text-sm">
-                            <option value="student" {{ old('role') === 'student' ? 'selected' : '' }}>Student
-                            </option>
-                            <option value="supervisor" {{ old('role') === 'supervisor' ? 'selected' : '' }}>Supervisor
-                            </option>
-                            <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Admin</option>
-                        </select>
+                @if ($errors->any())
+                    <div class="alert alert-error" style="margin-bottom:20px;">
+                        <div class="alert-body">
+                            <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <div>
+                                @foreach ($errors->all() as $e)
+                                    <div style="font-size:12.5px;">• {{ $e }}</div>
+                                @endforeach
+                            </div>
+                        </div>
+                        <button class="alert-close" onclick="this.closest('.alert').remove()">✕</button>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Department</label>
-                        <select name="department_id"
-                            class="mt-1 block w-full border-gray-300 rounded shadow-sm text-sm">
-                            <option value="">-- Select --</option>
-                            @foreach ($departments as $dept)
-                                <option value="{{ $dept->id }}"
-                                    {{ old('department_id') == $dept->id ? 'selected' : '' }}>
-                                    {{ $dept->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
+                @endif
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">
-                        Matric Number <span class="text-gray-400 text-xs">(students only)</span>
-                    </label>
-                    <input type="text" name="matric_number" value="{{ old('matric_number') }}"
-                        class="mt-1 block w-full border-gray-300 rounded shadow-sm text-sm">
-                </div>
+                <form method="POST" action="{{ route('admin.users.store') }}" class="space-y-4">
+                    @csrf
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Password</label>
-                        <input type="password" name="password" required
-                            class="mt-1 block w-full border-gray-300 rounded shadow-sm text-sm">
+                    <div class="form-group">
+                        <label class="form-label">Full Name *</label>
+                        <div class="input-wrap">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            <input type="text" name="name" class="form-input" value="{{ old('name') }}" required
+                                placeholder="Full name">
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                        <input type="password" name="password_confirmation" required
-                            class="mt-1 block w-full border-gray-300 rounded shadow-sm text-sm">
-                    </div>
-                </div>
 
-                <div class="flex justify-between pt-2">
-                    <a href="{{ route('admin.users.index') }}" class="text-sm text-gray-500 hover:underline">Cancel</a>
-                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 text-sm">
-                        Create User
-                    </button>
-                </div>
-            </form>
+                    <div class="form-group">
+                        <label class="form-label">Email Address *</label>
+                        <div class="input-wrap">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <path
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            <input type="email" name="email" class="form-input" value="{{ old('email') }}" required
+                                placeholder="email@example.com">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Role *</label>
+                            <div class="input-wrap">
+                                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <path
+                                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                </svg>
+                                <select name="role" class="form-select" required>
+                                    @foreach (['student', 'supervisor', 'admin'] as $r)
+                                        <option value="{{ $r }}" {{ old('role') === $r ? 'selected' : '' }}>
+                                            {{ ucfirst($r) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Department</label>
+                            <div class="input-wrap">
+                                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2M5 21H3" />
+                                </svg>
+                                <select name="department_id" class="form-select">
+                                    <option value="">— Select —</option>
+                                    @foreach ($departments as $dept)
+                                        <option value="{{ $dept->id }}"
+                                            {{ old('department_id') == $dept->id ? 'selected' : '' }}>
+                                            {{ $dept->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            Matric Number
+                            <span style="color:var(--text4);font-weight:400;">(students only)</span>
+                        </label>
+                        <div class="input-wrap">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.8">
+                                <path
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            <input type="text" name="matric_number" class="form-input"
+                                value="{{ old('matric_number') }}" placeholder="e.g. 220115087">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Password *</label>
+                            <div class="input-wrap">
+                                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <path
+                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                                <input type="password" name="password" class="form-input" required
+                                    placeholder="Minimum 8 characters">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirm Password *</label>
+                            <div class="input-wrap">
+                                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.8">
+                                    <path
+                                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04" />
+                                </svg>
+                                <input type="password" name="password_confirmation" class="form-input" required
+                                    placeholder="Re-enter password">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;">
+                        <a href="{{ route('admin.users.index') }}" class="btn btn-ghost">Cancel</a>
+                        <button type="submit" class="btn btn-gold">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 13l4 4L19 7" />
+                            </svg>
+                            Create User
+                        </button>
+                    </div>
+
+                </form>
+            </div>
         </div>
     </div>
+
 </x-app-layout>

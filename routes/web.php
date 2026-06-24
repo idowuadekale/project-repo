@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -100,6 +101,12 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('/activity', [AdminProjectController::class, 'activityLog'])->name('activity');
 
         Route::get('/reports', [ReportController::class, 'index'])->name('reports');
+        Route::get('/departments', [DepartmentController::class, 'index'])->name('departments.index');
+        Route::get('/departments/create', [DepartmentController::class, 'create'])->name('departments.create');
+        Route::post('/departments', [DepartmentController::class, 'store'])->name('departments.store');
+        Route::get('/departments/{department}/edit', [DepartmentController::class, 'edit'])->name('departments.edit');
+        Route::put('/departments/{department}', [DepartmentController::class, 'update'])->name('departments.update');
+        Route::delete('/departments/{department}', [DepartmentController::class, 'destroy'])->name('departments.destroy');
     });
 
 // Shared: any authenticated user can download approved project PDFs

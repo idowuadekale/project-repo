@@ -21,6 +21,10 @@ class UserController extends Controller
             $query->where('role', $request->role);
         }
 
+        if ($request->filled('department')) {
+            $query->where('department_id', $request->department);
+        }
+
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', '%'.$request->search.'%')
@@ -29,7 +33,7 @@ class UserController extends Controller
             });
         }
 
-        $users = $query->latest()->paginate(15);
+        $users = $query->latest()->paginate(15)->withQueryString();
         $departments = Department::orderBy('name')->get();
 
         return view('admin.users.index', compact('users', 'departments'));
