@@ -6,12 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Department;
 use App\Models\User;
+use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    public function __construct(protected CloudinaryService $cloudinary)
+    {
+    }
+
     // List all users
     public function index(Request $request)
     {
@@ -121,10 +126,32 @@ class UserController extends Controller
             return back()->with('error', 'You cannot delete your own account.');
         }
 
-        $name = $user->name;
-        $user->delete();
+        // Keep approved projects, delete pending/rejected
+        \App\Models\Project::where('student_id', $user->id)
+            ->where('status', 'approved')
+            ->update(['student_id' => null]);
 
+        \App\Models\Project::where('student_id', $user->id)
+            ->whereIn('status', ['pending', 'rejected'])
+            ->each(function ($project) {
+                if ($project->file_public_id) {
+                    $this->cloudinary->delete($project->file_public_id, 'raw');
+                }
+                $project->delete();
+            });
+
+        // Remove profile photo
+        if ($user->profile_photo_path) {
+            $this->cloudinary->delete(
+                'lasu-repo/avatars/user_'.$user->id,
+                'image'
+            );
+        }
+
+        $name = $user->name;
         ActivityLog::log('Deleted user account', $name);
+
+        $user->delete();
 
         return back()->with('success', "User \"{$name}\" deleted.");
     }

@@ -14,7 +14,8 @@ class Project extends Model
         'abstract',
         'year',
         'keywords',
-        'file_path',
+        'file_path',        // Cloudinary secure_url
+        'file_public_id',   // Cloudinary public_id for deletion
         'status',
         'rejection_reason',
         'student_id',

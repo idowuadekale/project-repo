@@ -20,7 +20,7 @@ class StoreProjectRequest extends FormRequest
                 'min:2000', 'max:'.date('Y')],
             'keywords' => ['nullable', 'string', 'max:255'],
             'supervisor_id' => ['required', 'exists:users,id'],
-            'project_file' => ['required', 'file', 'mimes:pdf', 'max:10240'], // 10MB max
+            'project_file' => ['required', 'file', 'mimes:pdf', 'max:20480'], // 20MB
         ];
     }
 

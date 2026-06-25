@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Department;
 use App\Models\Project;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class RepositoryController extends Controller
 {
@@ -129,9 +128,10 @@ class RepositoryController extends Controller
             abort(403, 'Only approved projects can be downloaded.');
         }
 
-        return Storage::disk('private')->download(
-            $project->file_path,
-            str()->slug($project->title).'.pdf'
-        );
+        if (!$project->file_path) {
+            return back()->with('error', 'No file attached to this project.');
+        }
+
+        return redirect()->away($project->file_path);
     }
 }

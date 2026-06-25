@@ -6,11 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Department;
 use App\Models\Project;
+use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class DepartmentController extends Controller
 {
+    public function __construct(protected CloudinaryService $cloudinary)
+    {
+    }
+
     public function index(Request $request)
     {
         $query = Department::withCount([
@@ -94,28 +99,21 @@ class DepartmentController extends Controller
 
     public function destroy(Department $department)
     {
-        // Professional cascade logic:
-        // — Approved projects: keep in repository, set department_id = null
-        //   (they stay visible; we just lose the department label)
-        // — Pending/rejected projects: delete them (they haven't been archived)
-        // — Users in this dept: set department_id = null (they stay, just unassigned)
-
-        // Nullify approved project department reference
+        // Keep approved projects in repository
         $department->projects()
             ->where('status', 'approved')
             ->update(['department_id' => null]);
 
-        // Delete pending + rejected projects (and log)
+        // Delete pending/rejected + their Cloudinary files
         $department->projects()
             ->whereIn('status', ['pending', 'rejected'])
             ->each(function ($project) {
-                if ($project->file_path) {
-                    \Storage::disk('private')->delete($project->file_path);
+                if ($project->file_public_id) {
+                    $this->cloudinary->delete($project->file_public_id, 'raw');
                 }
                 $project->delete();
             });
 
-        // Unassign users
         $department->users()->update(['department_id' => null]);
 
         $name = $department->name;
@@ -124,6 +122,6 @@ class DepartmentController extends Controller
         ActivityLog::log('Deleted department', $name);
 
         return redirect()->route('admin.departments.index')
-            ->with('success', "Department \"{$name}\" deleted. Approved projects kept in repository.");
+            ->with('success', "Department \"{$name}\" deleted.");
     }
 }

@@ -6,11 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\Project;
 use App\Models\User;
+use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
 {
+    public function __construct(protected CloudinaryService $cloudinary)
+    {
+    }
+
     // List all projects
     public function index(Request $request)
     {
@@ -98,8 +102,9 @@ class ProjectController extends Controller
     // Delete project + its file
     public function destroy(Project $project)
     {
-        if ($project->file_path) {
-            Storage::disk('private')->delete($project->file_path);
+        // Delete file from Cloudinary
+        if ($project->file_public_id) {
+            $this->cloudinary->delete($project->file_public_id, 'raw');
         }
 
         $title = $project->title;
@@ -130,9 +135,10 @@ class ProjectController extends Controller
     // Download PDF
     public function download(Project $project)
     {
-        return Storage::disk('private')->download(
-            $project->file_path,
-            str()->slug($project->title).'.pdf'
-        );
+        if (!$project->file_path) {
+            return back()->with('error', 'No file attached to this project.');
+        }
+
+        return redirect()->away($project->file_path);
     }
 }

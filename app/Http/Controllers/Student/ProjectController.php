@@ -7,22 +7,34 @@ use App\Http\Requests\StoreProjectRequest;
 use App\Models\ActivityLog;
 use App\Models\Project;
 use App\Models\User;
-use Illuminate\Support\Facades\Storage;
+use App\Services\CloudinaryService;
+use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
-    // Show all submissions by this student
-    public function index()
+    public function __construct(protected CloudinaryService $cloudinary)
     {
-        $projects = Project::where('student_id', auth()->id())
+    }
+
+    public function index(Request $request)
+    {
+        $query = Project::where('student_id', auth()->id())
             ->with(['supervisor', 'department'])
-            ->latest()
-            ->get();
+            ->latest();
+
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%'.$request->search.'%');
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $projects = $query->paginate(10)->withQueryString();
 
         return view('student.projects.index', compact('projects'));
     }
 
-    // Show submission form
     public function create()
     {
         $supervisors = User::where('role', 'supervisor')
@@ -33,30 +45,34 @@ class ProjectController extends Controller
         return view('student.projects.create', compact('supervisors'));
     }
 
-    // Store submission
     public function store(StoreProjectRequest $request)
     {
-        // Check: student can only have one approved or pending project
+        // One active project rule
         $existing = Project::where('student_id', auth()->id())
             ->whereIn('status', ['pending', 'approved'])
             ->exists();
 
         if ($existing) {
             return back()->with('error',
-                'You already have an active project submission.');
+                'You already have an active submission. Wait for a decision before submitting again.');
         }
 
-        // Handle PDF upload
-        $filePath = $request->file('project_file')
-            ->store('projects', 'private');
+        // Generate a clean public_id for Cloudinary
+        $publicId = 'proj_'.auth()->id().'_'.time();
 
-        // Create project
+        // Upload PDF to Cloudinary
+        $uploaded = $this->cloudinary->uploadPdf(
+            $request->file('project_file')->getRealPath(),
+            $publicId
+        );
+
         $project = Project::create([
             'title' => $request->title,
             'abstract' => $request->abstract,
             'year' => $request->year,
             'keywords' => $request->keywords,
-            'file_path' => $filePath,
+            'file_path' => $uploaded['url'],
+            'file_public_id' => $uploaded['public_id'],
             'student_id' => auth()->id(),
             'supervisor_id' => $request->supervisor_id,
             'department_id' => auth()->user()->department_id,
@@ -66,13 +82,11 @@ class ProjectController extends Controller
         ActivityLog::log('Submitted project', $project->title);
 
         return redirect()->route('student.projects.index')
-            ->with('success', 'Project submitted successfully! Awaiting supervisor review.');
+            ->with('success', 'Project submitted successfully. Awaiting supervisor review.');
     }
 
-    // View single project detail
     public function show(Project $project)
     {
-        // Students can only view their own projects
         if ($project->student_id !== auth()->id()) {
             abort(403);
         }
@@ -82,7 +96,10 @@ class ProjectController extends Controller
         return view('student.projects.show', compact('project'));
     }
 
-    // Download the PDF
+    /**
+     * Download — redirect to Cloudinary URL directly.
+     * No local disk needed. Vercel-safe.
+     */
     public function download(Project $project)
     {
         $user = auth()->user();
@@ -95,9 +112,12 @@ class ProjectController extends Controller
             abort(403);
         }
 
-        return Storage::disk('private')->download(
-            $project->file_path,
-            str()->slug($project->title).'.pdf'
-        );
+        if (!$project->file_path) {
+            return back()->with('error', 'No file attached to this project.');
+        }
+
+        // Redirect directly to the Cloudinary URL
+        // Cloudinary serves it with Content-Disposition: attachment
+        return redirect()->away($project->file_path);
     }
 }

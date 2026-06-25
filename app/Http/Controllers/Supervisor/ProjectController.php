@@ -131,4 +131,17 @@ class ProjectController extends Controller
 
         return back()->with('success', 'Project reverted to pending for re-review.');
     }
+
+    public function download(Project $project)
+    {
+        if ($project->supervisor_id !== auth()->id() && !auth()->user()->isAdmin()) {
+            abort(403);
+        }
+
+        if (!$project->file_path) {
+            return back()->with('error', 'No file attached to this project.');
+        }
+
+        return redirect()->away($project->file_path);
+    }
 }

@@ -18,6 +18,9 @@ class User extends Authenticatable
         'password',
         'role',
         'department_id',
+        'profile_photo_path',
+        'phone',
+        'bio',
     ];
 
     protected $hidden = [
@@ -63,5 +66,27 @@ class User extends Authenticatable
     public function isStudent(): bool
     {
         return $this->role === 'student';
+    }
+
+    // Get profile photo URL or null
+    public function getPhotoUrlAttribute(): ?string
+    {
+        if ($this->profile_photo_path) {
+            // Cloudinary URL stored directly
+            return $this->profile_photo_path;
+        }
+
+        return null;
+    }
+
+    // Get initials for avatar placeholder
+    public function getInitialsAttribute(): string
+    {
+        $parts = explode(' ', trim($this->name));
+        if (count($parts) >= 2) {
+            return strtoupper($parts[0][0].$parts[count($parts) - 1][0]);
+        }
+
+        return strtoupper($parts[0][0] ?? 'U');
     }
 }

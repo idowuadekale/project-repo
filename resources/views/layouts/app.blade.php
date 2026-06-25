@@ -27,9 +27,8 @@
 
             {{-- User info --}}
             <div class="sidebar-user">
-                @if (auth()->user()->profile_photo_path ?? false)
-                    <img src="{{ Storage::url(auth()->user()->profile_photo_path) }}" alt=""
-                        class="sidebar-avatar">
+                @if (auth()->user()->profile_photo_path)
+                    <img src="{{ auth()->user()->profile_photo_path }}" alt="" class="sidebar-avatar">
                 @else
                     <div class="sidebar-avatar-placeholder">
                         {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
@@ -189,13 +188,13 @@
 
             {{-- Sidebar footer --}}
             <div class="sidebar-footer">
-                {{-- <a href="{{ route('profile.edit') }}"
+                <a href="{{ route('profile.edit') }}"
                     class="sidebar-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                         <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                     Profile
-                </a> --}}
+                </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="sidebar-link"
