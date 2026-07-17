@@ -132,6 +132,17 @@ class RepositoryController extends Controller
             return back()->with('error', 'No file attached to this project.');
         }
 
-        return redirect()->away($project->file_path);
+        $filename = \Str::slug($project->title).'.pdf';
+        $fileContent = file_get_contents($project->file_path);
+
+        return response()->streamDownload(
+            fn () => print ($fileContent),
+            $filename,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+                'Content-Length' => strlen($fileContent),
+            ]
+        );
     }
 }

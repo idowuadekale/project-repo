@@ -116,8 +116,31 @@ class ProjectController extends Controller
             return back()->with('error', 'No file attached to this project.');
         }
 
-        // Redirect directly to the Cloudinary URL
-        // Cloudinary serves it with Content-Disposition: attachment
-        return redirect()->away($project->file_path);
+        return $this->streamDownload($project);
+    }
+
+    private function streamDownload(Project $project): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        // Build a clean filename from the project title
+        $filename = \Str::slug($project->title).'.pdf';
+
+        // Fetch the file content from Cloudinary
+        $fileContent = file_get_contents($project->file_path);
+
+        if ($fileContent === false) {
+            return back()->with('error', 'Could not retrieve file. Please try again.');
+        }
+
+        return response()->streamDownload(
+            function () use ($fileContent) {
+                echo $fileContent;
+            },
+            $filename,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+                'Content-Length' => strlen($fileContent),
+            ]
+        );
     }
 }

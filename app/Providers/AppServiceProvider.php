@@ -19,6 +19,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Force Cloudinary configuration
+        \Cloudinary\Configuration\Configuration::instance(
+            env('CLOUDINARY_URL')
+        );
+
         if (app()->environment('production')) {
             URL::forceScheme('https');
         }
